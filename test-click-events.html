@@ -1,0 +1,109 @@
+<html lang ="en">
+<head>
+	<meta charset="utf-8">
+	<title>Test My Clicks</title>
+	<link rel="stylesheet" href="./assets/css/bootstrap.css" rel="stylesheet">
+	<link rel="stylesheet" href="./assets/css/styles.css" rel="stylesheet">
+</head>
+
+<body>
+	<section class = "navbar navbar-inverse navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container">
+				<span class = "brand">click</span>
+			</div>
+		</div>
+	</section>
+
+	<!-- wrapped around app -->
+	<section id="app-container">
+		<!-- region targeted by app code at the bottom of this file -->
+		<div id="main-region" class="container">
+			<p>Some basic content to be replaced on app load.</p>
+		</div>
+	</section>
+
+	<!--
+	// define templates for Marionette views within script tags
+	//  - it's not HTML, so browser will not display it
+	//  - it's not js, so browser will not execute it
+	-->
+	<script type="text/template" id="basic-template">
+		<p>Template swapped and rendered courtesy of this app!</p>
+		<button>Awright I guess</button>
+	</script>
+
+	<script type="text/template" id="second-basic-template">
+		<p>A second template swapped into our views!!</p>
+	</script>
+
+	<!-- Fill out templates from models
+			<%- render after evaluating, with escaping %>
+			<% execute logic statements %>
+			<%= render without escaping %>
+	-->
+	<script type="text/template" id="model-list-item">
+		<li><%- firstName %> <%- lastName %></li>
+	</script>
+
+	<!-- Script imports in order of dependency -->
+	<script src="./assets/js/vendor/jquery-1.12.2.js"></script>
+	<script src="./assets/js/vendor/json2.js"></script>
+	<script src="./assets/js/vendor/underscore.js"></script>
+	<script src="./assets/js/vendor/bootstrap.js"></script>
+	<script src="./assets/js/vendor/backbone.js"></script>
+	<script src="./assets/js/vendor/backbone.marionette.js"></script>
+
+	<!-- Basic Marionette app code -->
+	<script type="text/javascript">
+		// init marionette app
+		var MyAppName = new Marionette.Application();
+
+		/**
+		 *	Plain old view with extra eplanations
+		 */
+		MyAppName.MyBasicView = Marionette.ItemView.extend({
+			// target element region to insert template
+			// (look for my main-region way up above!)
+			el: "#main-region",
+			// template element that will get inserted
+			// (look for my template within <script> tags way above, too!)
+			template: "#basic-template"
+		});
+
+		MyAppName.MyLayout = Marionette.Layout.extend({
+		});
+
+		MyAppName.on ("before:start", function(){
+			// create a region for handling multiple views
+			var HandleRegions = Marionette.LayoutView.extend({
+				el: "#app-container",
+				regions: {
+					main: "#main-region"
+				}
+			});
+
+			// assign layout to the app's regions to handle all views
+			MyAppName.regions = new HandleRegions();
+		});
+
+		// render the view on start event
+		// accepts values: before:start, start, after:start
+		MyAppName.on ("start", function() {
+			
+			// instantiate collections view for test model above
+			var startingLayout = new MyAppName.MyLayout({
+
+			});
+
+			// use regions (started in before:start event handler) to render layout
+			MyAppName.regions.main.show (startingLayout);
+
+		});
+
+		MyAppName.start();
+	</script>
+
+</body>
+
+</html>

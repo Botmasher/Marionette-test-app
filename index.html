@@ -62,10 +62,10 @@
  		 *	Data models, collections and views (lists)
  		 */
 		// start up a model
-		MyAppName.Model = Backbone.Model.extend({});
+		MyAppName.HumanName = Backbone.Model.extend({});
 		// start up a collection to hold all models
-		MyAppName.ModelCollection = Backbone.Collection.extend({
-			model: MyAppName.Model,
+		MyAppName.HumanNameCollection = Backbone.Collection.extend({
+			model: MyAppName.HumanName,
 			// define a comparator field (sorts automatically)
 			comparator: 'lastName'
 		});
@@ -129,7 +129,7 @@
 		MyAppName.on ("start", function() {
 
 			// create some test model data
-			var testDataItems = new MyAppName.ModelCollection([
+			var testDataItems = new MyAppName.HumanNameCollection([
 				{
 					firstName: "Mouse",
 					lastName: "Inyurhouse"
@@ -139,14 +139,25 @@
 					lastName: "Enyerpayyuntz"
 				}
 			]);
-
+			
 			// instantiate collections view for test model above
 			var myModelListView = new MyAppName.ModelsView({
 				collection: testDataItems
 			});
 
+			// // Here we have set the `id` of the model
+			// var human = new MyAppName.HumanName({id: 1});
+
+			// // The fetch below will perform GET /user/1
+			// // The server should return the id, name and email from the database
+			// humanData = human.fetch({
+			// 	success: function (human) {
+			// 		alert(JSON.stringify(human));
+			// 	}
+			// })
+
 			// use regions (started in before:start event handler) to render multiple views
-			MyAppName.regions.main.show(myModelListView);
+			MyAppName.regions.main.show(humanData);
 
 			/* // Alternative to regions: just render plain old views, each on its own
 			var testView = new MyAppName.MyBasicView();
