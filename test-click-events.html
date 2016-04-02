@@ -24,26 +24,15 @@
 	</section>
 
 	<!--
-	// define templates for Marionette views within script tags
-	//  - it's not HTML, so browser will not display it
-	//  - it's not js, so browser will not execute it
+	// templates for Marionette view items
 	-->
-	<script type="text/template" id="basic-template">
+	<script type="text/template" id="button-template">
 		<p>Template swapped and rendered courtesy of this app!</p>
-		<button>Awright I guess</button>
+		<button id="btn-0">Awright I guess</button>
 	</script>
 
 	<script type="text/template" id="second-basic-template">
 		<p>A second template swapped into our views!!</p>
-	</script>
-
-	<!-- Fill out templates from models
-			<%- render after evaluating, with escaping %>
-			<% execute logic statements %>
-			<%= render without escaping %>
-	-->
-	<script type="text/template" id="model-list-item">
-		<li><%- firstName %> <%- lastName %></li>
 	</script>
 
 	<!-- Script imports in order of dependency -->
@@ -54,54 +43,56 @@
 	<script src="./assets/js/vendor/backbone.js"></script>
 	<script src="./assets/js/vendor/backbone.marionette.js"></script>
 
-	<!-- Basic Marionette app code -->
+	<!-- Marionette app -->
 	<script type="text/javascript">
-		// init marionette app
-		var MyAppName = new Marionette.Application();
 
-		/**
-		 *	Plain old view with extra eplanations
-		 */
-		MyAppName.MyBasicView = Marionette.ItemView.extend({
-			// target element region to insert template
-			// (look for my main-region way up above!)
-			el: "#main-region",
-			// template element that will get inserted
-			// (look for my template within <script> tags way above, too!)
-			template: "#basic-template"
+		var MyApp = new Marionette.Application();
+
+		MyApp.MyButtonView = Marionette.ItemView.extend({
+			el: ".container",
+			template: "#button-template",
+			events: {
+				"click #btn-0": "onClicked"
+			},
+			onClicked: function(){
+				this.triggerMethod("show:message", "Good");
+			}
 		});
 
-		MyAppName.MyLayout = Marionette.Layout.extend({
+		var MyOtherView = Marionette.ItemView.extend({
+			el: ".container",
+			template: "#second-basic-template",
 		});
 
-		MyAppName.on ("before:start", function(){
+		MyApp.on ("before:start", function(){
 			// create a region for handling multiple views
 			var HandleRegions = Marionette.LayoutView.extend({
 				el: "#app-container",
 				regions: {
 					main: "#main-region"
-				}
+				},
+				childEvents: {
+					"show:message": "onMessage"
+				},
+				onMessage: function(view, message) {
+					if (message=="Good") {
+						new MyOtherView().render();
+					} else {
+						console.log ("I got the message, but I can't go anywhere from here.");
+					}
+				},
 			});
-
 			// assign layout to the app's regions to handle all views
-			MyAppName.regions = new HandleRegions();
+			MyApp.regions = new HandleRegions();
 		});
 
-		// render the view on start event
-		// accepts values: before:start, start, after:start
-		MyAppName.on ("start", function() {
-			
-			// instantiate collections view for test model above
-			var startingLayout = new MyAppName.MyLayout({
-
-			});
-
+		MyApp.on ("start", function() {
+			var startingView = new MyApp.MyButtonView();
 			// use regions (started in before:start event handler) to render layout
-			MyAppName.regions.main.show (startingLayout);
-
+			MyApp.regions.main.show (startingView);
 		});
 
-		MyAppName.start();
+        MyApp.start();
 	</script>
 
 </body>
