@@ -32,10 +32,6 @@
 		<p>Template swapped and rendered courtesy of this app!</p>
 	</script>
 
-	<script type="text/template" id="second-basic-template">
-		<p>A second template swapped into our views!!</p>
-	</script>
-
 	<!-- Fill out templates from models
 			<%- render after evaluating, with escaping %>
 			<% execute logic statements %>
@@ -53,122 +49,100 @@
 	<script src="./assets/js/vendor/backbone.js"></script>
 	<script src="./assets/js/vendor/backbone.marionette.js"></script>
 
+
 	<!-- Basic Marionette app code -->
 	<script type="text/javascript">
+		
 		// init marionette app
-		var MyAppName = new Marionette.Application();
+		var MyApp = new Marionette.Application();
+
 
 		/**
- 		 *	Data models, collections and views (lists)
+ 		 *	Data model and collection
  		 */
-		// start up a model
-		MyAppName.HumanName = Backbone.Model.extend({});
-		// start up a collection to hold all models
-		MyAppName.HumanNameCollection = Backbone.Collection.extend({
-			model: MyAppName.HumanName,
-			// define a comparator field (sorts automatically)
-			comparator: 'lastName'
-		});
-		// list items template for each item in models
-		MyAppName.ModelItemView = Marionette.ItemView.extend({
-			template: "#model-list-item",
-			// Get rid of auto-inserted Marionette wrapping div
-			// credit to bejonbee for this stackoverflow snippet
-			onRender: function () {
-				// Assumes 1 child element present in template.
-				this.$el = this.$el.children();
-				// Unwrap the element to prevent infinitely 
-				// nesting elements during re-render.
-				this.$el.unwrap();
-				this.setElement(this.$el);
+
+		/* start up a user model (object) */
+		MyApp.User = Backbone.Model.extend({
+			// some default data if desired
+			defaults: function () {
+				return {
+					firstName: '',
+					lastName: ''
+				};
 			}
 		});
-		// entire list for models, with ref to list items above
-		MyAppName.ModelsView = Marionette.CollectionView.extend({
-			tagName: "ul",
-			childView: MyAppName.ModelItemView
-		})
 
-		/**
-		 *	Plain old view with extra eplanations
-		 */
-		// create a view with ref to our template above
-		// defines a target main-region (within an app-container)
-		// Responsibilities:
-		// 	- monitor the models being displayed
-		//  - rerender when those models are updated
-		MyAppName.MyBasicView = Marionette.ItemView.extend({
-			// target element region to insert template
-			//  (look for my main-region way up above!)
-			el: "#main-region",
-			// template element that will get inserted
-			//  (look for my template within <script> tags way above, too!)
-			template: "#basic-template",
-			// setup the tag around our template
-			// (without these, it inserts in a plain div by default)
-			id: "new-view", // id for this tag
-			tagName: "span", // or "div" or whatever tag you want
-			className: "test-insert", // give your tag a class
+		/* start up array of user models */
+		MyApp.UsersCollection = Backbone.Collection.extend({
+			// this is an array of objects (models) defined above
+			model: MyApp.User,
+			// define the field to sort by
+			comparator: 'lastName'
 		});
 
-		MyAppName.on ("before:start", function(){
-			// create a region for handling multiple views
+
+		/**
+		 *	Data display
+		 */
+
+		/* list item template for each username */
+		MyApp.UserModelView = Marionette.ItemView.extend({
+			template: "#model-list-item"
+		});
+
+		/* list to wrap up all usernames */
+		MyApp.UsersCollectionView = Marionette.CollectionView.extend({
+			// tag for this parent view
+			tagName: "ul",
+			// reference to li (otherwise error that you're missing ChildView)
+			childView: MyApp.UserModelView
+		})
+
+
+		/*
+		 *	Start the app
+		 */
+
+		/* define regions before start event */
+		MyApp.on ("before:start", function(){
+			// create a REGION for handling multiple views
 			var HandleRegions = Marionette.LayoutView.extend({
 				el: "#app-container",
 				regions: {
 					main: "#main-region"
 				}
 			});
-
-			// assign layout to the app's regions to handle all views
-			MyAppName.regions = new HandleRegions();
+			// assign that region to the app's regions property
+			MyApp.regions = new HandleRegions();
 		});
 
-		// render the view on start event
-		// accepts values: before:start, start, after:start
-		MyAppName.on ("start", function() {
+		/* fill with data and render the view on start event */
+		MyApp.on ("start", function() {
 
-			// create some test model data
-			var testDataItems = new MyAppName.HumanNameCollection([
+			// create test array (collection) of user models
+			var testUsers = new MyApp.UsersCollection([
 				{
 					firstName: "Mouse",
-					lastName: "Inyurhouse"
+					lastName: "Inhouse"
 				},
 				{
 					firstName: "Hayyund",
-					lastName: "Enyerpayyuntz"
+					lastName: "Enayyuntz"
 				}
 			]);
 			
 			// instantiate collections view for test model above
-			var myModelListView = new MyAppName.ModelsView({
-				collection: testDataItems
+			var testUsersView = new MyApp.UsersCollectionView({
+				collection: testUsers
 			});
 
-			// // Here we have set the `id` of the model
-			// var human = new MyAppName.HumanName({id: 1});
-
-			// // The fetch below will perform GET /user/1
-			// // The server should return the id, name and email from the database
-			// humanData = human.fetch({
-			// 	success: function (human) {
-			// 		alert(JSON.stringify(human));
-			// 	}
-			// })
-
 			// use regions (started in before:start event handler) to render multiple views
-			MyAppName.regions.main.show(humanData);
+			MyApp.regions.main.show (testUsersView);
 
-			/* // Alternative to regions: just render plain old views, each on its own
-			var testView = new MyAppName.MyBasicView();
-			testView.render();
-			// switch in another template instead of the one I assigned to this view
-			testView.template = "#second-basic-template";
-			testView.render();
-			*/
 		});
 
-		MyAppName.start();
+		MyApp.start();
+
 	</script>
 
 </body>
