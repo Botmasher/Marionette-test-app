@@ -1,45 +1,34 @@
 <html lang ="en">
 <head>
 	<meta charset="utf-8">
-	<title>Manage My Contacts</title>
+	<title>List Some Users</title>
 	<link rel="stylesheet" href="./assets/css/bootstrap.css" rel="stylesheet">
 	<link rel="stylesheet" href="./assets/css/styles.css" rel="stylesheet">
 </head>
 
 <body>
+	<!-- just a navbar with some styled text -->
 	<section class = "navbar navbar-inverse navbar-fixed-top">
 		<div class="navbar-inner">
 			<div class="container">
-				<span class = "brand">contacts</span>
+				<span class = "brand">Users</span>
 			</div>
 		</div>
 	</section>
 
-	<!-- wrapped around app -->
+
+	<!-- MyApp inserts stuff in here -->
 	<section id="app-container">
+
 		<!-- region targeted by app code at the bottom of this file -->
 		<div id="main-region" class="container">
+
 			<p>Some basic content to be replaced on app load.</p>
+
 		</div>
+
 	</section>
 
-	<!--
-	// define templates for marionette views within script tags
-	//  - it's not HTML, so browser will not display it
-	//  - it's not js, so browser will not execute it
-	-->
-	<script type="text/template" id="basic-template">
-		<p>Template swapped and rendered courtesy of this app!</p>
-	</script>
-
-	<!-- Fill out templates from models
-			<%- render after evaluating, with escaping %>
-			<% execute logic statements %>
-			<%= render without escaping %>
-	-->
-	<script type="text/template" id="model-list-item">
-		<li><%- firstName %> <%- lastName %></li>
-	</script>
 
 	<!-- Script imports in order of dependency -->
 	<script src="./assets/js/vendor/jquery-1.12.2.js"></script>
@@ -64,11 +53,9 @@
 		/* start up a user model (object) */
 		MyApp.User = Backbone.Model.extend({
 			// some default data if desired
-			defaults: function () {
-				return {
+			defaults: {
 					firstName: '',
 					lastName: ''
-				};
 			}
 		});
 
@@ -85,16 +72,17 @@
 		 *	Data display
 		 */
 
-		/* list item template for each username */
+		/* list item for each username */
 		MyApp.UserModelView = Marionette.ItemView.extend({
-			template: "#model-list-item"
+			// same result as pointing to "#model-list-item" template script tag above
+			template: _.template("<li><%- firstName %> <%- lastName %></li>")
 		});
 
-		/* list to wrap up all usernames */
+		/* list around all list items */
 		MyApp.UsersCollectionView = Marionette.CollectionView.extend({
 			// tag for this parent view
 			tagName: "ul",
-			// reference to li (otherwise error that you're missing ChildView)
+			// reference to li (otherwise error that you're missing a childView)
 			childView: MyApp.UserModelView
 		})
 
