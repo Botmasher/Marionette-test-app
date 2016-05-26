@@ -25,6 +25,7 @@
 
 			<p>Some basic content to be replaced on app load.</p>
 
+			<form><button id = "hidetxt_btn">Hide these names</button></form>
 		</div>
 
 	</section>
@@ -80,11 +81,40 @@
 
 		/* list around all list items */
 		MyApp.UsersCollectionView = Marionette.CollectionView.extend({
+			
+			ui: {
+				"hide": "#hidetxt_btn"
+			},
+			
 			// tag for this parent view
 			tagName: "ul",
 			// reference to li (otherwise error that you're missing a childView)
-			childView: MyApp.UserModelView
-		})
+			childView: MyApp.UserModelView,
+			
+			behaviors: {
+				HideText: {}
+			}
+
+		});
+
+		Marionette.Behaviors.behaviorslookup = function () {
+			return window.Behaviors;
+		}
+		window.Behaviors.HideText = HideText;
+
+
+		/*
+		 *	Button click behavior
+		 */
+
+		var HideText = Marionette.Behavior.extend ({
+			events: {
+				"click @ui.hide": "hideText"
+			},
+			hideText: function () {
+				this.view.destroy();
+			}
+		});
 
 
 		/*
