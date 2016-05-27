@@ -25,9 +25,10 @@
 
 			<p>Some basic content to be replaced on app load.</p>
 
-			<form><button id = "hidetxt_btn">Hide these names</button></form>
 		</div>
 
+		<div id="btn-div"><button id = "btn-clicker">Click this button!</button></div>
+	
 	</section>
 
 
@@ -75,44 +76,38 @@
 
 		/* list item for each username */
 		MyApp.UserModelView = Marionette.ItemView.extend({
-			// same result as pointing to "#model-list-item" template script tag above
-			template: _.template("<li><%- firstName %> <%- lastName %></li>")
+			// use getTemplate to select template with some logic
+			getTemplate: function () {
+				if (this.model.get("firstName")) {
+					return _.template("<li><%- firstName %> <%- lastName%></li>");
+				}
+				return _.template("<li>no name found</li>");
+			}
 		});
 
 		/* list around all list items */
 		MyApp.UsersCollectionView = Marionette.CollectionView.extend({
-			
-			ui: {
-				"hide": "#hidetxt_btn"
-			},
-			
 			// tag for this parent view
 			tagName: "ul",
 			// reference to li (otherwise error that you're missing a childView)
-			childView: MyApp.UserModelView,
-			
-			behaviors: {
-				HideText: {}
-			}
+			childView: MyApp.UserModelView
 
 		});
 
-		Marionette.Behaviors.behaviorslookup = function () {
-			return window.Behaviors;
-		}
-		window.Behaviors.HideText = HideText;
-
 
 		/*
-		 *	Button click behavior
+		 *
 		 */
 
-		var HideText = Marionette.Behavior.extend ({
+		MyApp.ButtonClickerView = Marionette.ItemView.extend({
+			el: "#btn-div",
+			template: false,
+			// listen for click on button
 			events: {
-				"click @ui.hide": "hideText"
+				"click #btn-clicker" : "TestFunc"
 			},
-			hideText: function () {
-				this.view.destroy();
+			TestFunc: function(e) {
+				console.log ("Button clicked!");
 			}
 		});
 
@@ -153,6 +148,9 @@
 			var testUsersView = new MyApp.UsersCollectionView({
 				collection: testUsers
 			});
+
+			var testButtonClicker = new MyApp.ButtonClickerView();
+			testButtonClicker.render();
 
 			// use regions (started in before:start event handler) to render multiple views
 			MyApp.regions.main.show (testUsersView);
