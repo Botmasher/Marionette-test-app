@@ -21,14 +21,18 @@
 	<section id="app-container">
 
 		<!-- region targeted by app code at the bottom of this file -->
-		<div id="main-region" class="container">
+		<div id="main-section" class="container">
 
 			<p>Some basic content to be replaced on app load.</p>
 
 		</div>
 
-		<div id="btn-div"><button id = "btn-clicker">Click this button!</button></div>
-	
+		<div id="sub-section">
+
+			<p>A second region to swap content into.</p>
+
+		</div>
+
 	</section>
 
 
@@ -95,17 +99,19 @@
 		});
 
 
-		/*
-		 *
+
+		/**
+		 *	Form & interaction views
 		 */
 
+		// button
 		MyApp.ButtonClickerView = Marionette.ItemView.extend({
-			el: "#btn-div",
-			template: false,
+			template: _.template('<button id = "btn-clicker">Click me!</button>'),
 			// listen for click on button
 			events: {
 				"click #btn-clicker" : "TestFunc"
 			},
+			// handle button click
 			TestFunc: function(e) {
 				console.log ("Button clicked!");
 			}
@@ -122,7 +128,8 @@
 			var HandleRegions = Marionette.LayoutView.extend({
 				el: "#app-container",
 				regions: {
-					main: "#main-region"
+					main: "#main-section",
+					sub: "#sub-section"
 				}
 			});
 			// assign that region to the app's regions property
@@ -144,17 +151,17 @@
 				}
 			]);
 			
-			// instantiate collections view for test model above
+			// instantiate collections view with data from above test model
 			var testUsersView = new MyApp.UsersCollectionView({
 				collection: testUsers
 			});
 
+			// instantiate basic views
 			var testButtonClicker = new MyApp.ButtonClickerView();
-			testButtonClicker.render();
 
 			// use regions (started in before:start event handler) to render multiple views
 			MyApp.regions.main.show (testUsersView);
-
+			MyApp.regions.sub.show (testButtonClicker);
 		});
 
 		MyApp.start();
