@@ -91,6 +91,7 @@
 
 		/* list around all list items */
 		MyApp.UsersCollectionView = Marionette.CollectionView.extend({
+			el: "#main-section",
 			// tag for this parent view
 			tagName: "ul",
 			// reference to li (otherwise error that you're missing a childView)
@@ -101,19 +102,19 @@
 
 
 		/**
-		 *	Form & interaction views
+		 *	Interaction views
 		 */
 
 		// button
 		MyApp.ButtonClickerView = Marionette.ItemView.extend({
-			template: _.template('<button id = "btn-clicker">Click me!</button>'),
+			template: _.template('<button id = "btn-clicker">Show / hide</button>'),
 			// listen for click on button
 			events: {
 				"click #btn-clicker" : "TestFunc"
 			},
 			// handle button click
-			TestFunc: function(e) {
-				console.log ("Button clicked!");
+			TestFunc: function() {
+				this.triggerMethod("show:userNames");
 			}
 		});
 
@@ -124,21 +125,6 @@
 
 		/* define regions before start event */
 		MyApp.on ("before:start", function(){
-			// create a REGION for handling multiple views
-			var HandleRegions = Marionette.LayoutView.extend({
-				el: "#app-container",
-				regions: {
-					main: "#main-section",
-					sub: "#sub-section"
-				}
-			});
-			// assign that region to the app's regions property
-			MyApp.regions = new HandleRegions();
-		});
-
-		/* fill with data and render the view on start event */
-		MyApp.on ("start", function() {
-
 			// create test array (collection) of user models
 			var testUsers = new MyApp.UsersCollection([
 				{
@@ -150,19 +136,48 @@
 					lastName: "Enayyuntz"
 				}
 			]);
-			
-			// instantiate collections view with data from above test model
-			var testUsersView = new MyApp.UsersCollectionView({
-				collection: testUsers
+
+			// create a REGION for handling multiple views
+			var HandleRegions = Marionette.LayoutView.extend({
+				el: "#app-container",
+				regions: {
+					main: "#main-section",
+					sub: "#sub-section"
+				},
+				// triggered in ButtonClickerView
+				childEvents: {
+					"show:userNames": "showUserNames"
+				},
+				showUserNames: function(view) {
+					if ( $("li").length ) {
+						testUsersView.destroy();
+					} else {
+						// instantiate collections view with data from above model
+						var testUsersView = new MyApp.UsersCollectionView({
+							collection: testUsers
+						});
+						testUsersView.render();
+					}
+				}
 			});
+
+			// assign that region to the app's regions property
+			MyApp.regions = new HandleRegions();
+		});
+
+
+		/* fill with data and render the view on start event */
+		MyApp.on ("start", function() {
 
 			// instantiate basic views
 			var testButtonClicker = new MyApp.ButtonClickerView();
 
-			// use regions (started in before:start event handler) to render multiple views
-			MyApp.regions.main.show (testUsersView);
+			// use regions (started in before:start event handler) to render views
+			//MyApp.regions.main.show (testUsersView);
+			MyApp.regions.main.empty();
 			MyApp.regions.sub.show (testButtonClicker);
 		});
+
 
 		MyApp.start();
 
