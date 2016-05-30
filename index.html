@@ -83,9 +83,9 @@
 			// use getTemplate to select template with some logic
 			getTemplate: function () {
 				if (this.model.get("firstName")) {
-					return _.template("<li><%- firstName %> <%- lastName%></li>");
+					return _.template("<li class='userNames'><%- firstName %> <%- lastName%></li>");
 				}
-				return _.template("<li>no name found</li>");
+				return _.template("<li class='userNames'>no name found</li>");
 			}
 		});
 
@@ -94,9 +94,9 @@
 			el: "#main-section",
 			// tag for this parent view
 			tagName: "ul",
+			//className: "userName-list",
 			// reference to li (otherwise error that you're missing a childView)
 			childView: MyApp.UserModelView
-
 		});
 
 
@@ -137,6 +137,8 @@
 				}
 			]);
 
+			var tempView;
+
 			// create a REGION for handling multiple views
 			var HandleRegions = Marionette.LayoutView.extend({
 				el: "#app-container",
@@ -150,13 +152,14 @@
 				},
 				showUserNames: function(view) {
 					if ( $("li").length ) {
-						testUsersView.destroy();
+						// destroy all userName list items
+						$(".userNames").remove();
 					} else {
 						// instantiate collections view with data from above model
-						var testUsersView = new MyApp.UsersCollectionView({
+						tempView = new MyApp.UsersCollectionView({
 							collection: testUsers
 						});
-						testUsersView.render();
+						tempView.render();
 					}
 				}
 			});
