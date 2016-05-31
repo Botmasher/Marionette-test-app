@@ -96,7 +96,15 @@
 			tagName: "ul",
 			//className: "userName-list",
 			// reference to li (otherwise error that you're missing a childView)
-			childView: MyApp.UserModelView
+			childView: MyApp.UserModelView,
+			getTemplate: function () {
+				if ( $("li").length ) {
+					// do not show this template
+					return _.template("");
+				} else {
+					return this.template;
+				}
+			}
 		});
 
 
