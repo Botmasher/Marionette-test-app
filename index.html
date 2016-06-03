@@ -78,7 +78,7 @@
 		 */
 
 		/* list item for each username */
-		MyApp.UserModelView = Marionette.ItemView.extend({
+		var UserItemView = Backbone.Marionette.ItemView.extend({
 			tagName: "li",
 			// use getTemplate to select template with some logic
 			getTemplate: function () {
@@ -90,12 +90,11 @@
 		});
 
 		/* list around all list items */
-		MyApp.UsersCollectionView = Marionette.CollectionView.extend({
-			el: "#main-section",
-			// tag for this parent view
+		var UsersListView = Backbone.Marionette.CompositeView.extend({
+			template: _.template("<div></div>"),
 			tagName: "ul",
 			// reference to item (otherwise error that you're missing a childView)
-			childView: MyApp.UserModelView
+			itemView: UserItemView
 		});
 
 
@@ -155,10 +154,11 @@
 						$("li").remove();
 					} else {
 						// instantiate collections view with data from above model
-						tempView = new MyApp.UsersCollectionView({
-							collection: testUsers
-						});
-						tempView.render();
+						// tempView = new UsersListView({
+						// 	collection: testUsers
+						// });
+						UsersListView.collection = testUsers;
+						console.log(UsersListView.collection.models[0].attributes.firstName);
 					}
 				}
 			});
